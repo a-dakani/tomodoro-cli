@@ -8,22 +8,22 @@ import (
 
 func readTeamsFile() ([]Team, error) {
 	var teams []Team
-
 	if _, err := os.Stat(teamsFile); errors.Is(err, os.ErrNotExist) {
-		_, err := os.Create(teamsFile)
+		err = os.MkdirAll(configPath, os.ModePerm)
 		if err != nil {
 			return teams, err
 		}
-
-		team := createTestTeam()
-		teams = append(teams, team)
+		_, err = os.Create(teamsFile)
+		if err != nil {
+			return nil, err
+		}
 
 		bytes, err := json.MarshalIndent(teams, "", "  ")
 		if err != nil {
 			return teams, err
 		}
 
-		err = os.WriteFile(teamsFile, bytes, 0600)
+		err = os.WriteFile(teamsFile, bytes, os.ModePerm)
 
 		return teams, err
 	}
@@ -59,7 +59,7 @@ func removeTeamFromFile(team Team) error {
 		return err
 	}
 
-	err = os.WriteFile(teamsFile, bytes, 0600)
+	err = os.WriteFile(teamsFile, bytes, os.ModePerm)
 	if err != nil {
 		return err
 	}
@@ -94,7 +94,7 @@ func addTeamToFile(team Team) error {
 		return err
 	}
 
-	err = os.WriteFile(teamsFile, bytes, 0600)
+	err = os.WriteFile(teamsFile, bytes, os.ModePerm)
 	if err != nil {
 		return err
 	}
@@ -102,11 +102,10 @@ func addTeamToFile(team Team) error {
 	return nil
 }
 
-func createTestTeam() Team {
-	return Team{
-		Name:  "tomodoro-test-team",
-		Slug:  "tomodoro-test-team",
-		Focus: 25 * 60 * 1000000000,
-		Pause: 5 * 60 * 1000000000,
+func getConfigFilePath() string {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
 	}
+	return homeDir + "/.config/tomodoro"
 }

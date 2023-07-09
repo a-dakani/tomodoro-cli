@@ -34,19 +34,19 @@ clean:
 	rm -rf $(BUILD_PATH)
 
 
-## Install CLI target
-#install-cli: build-cli
-#	sudo cp $(BUILD_PATH)/$(EXECUTABLE_CLI) $(BIN_DIR)/tomodoro
-#
-## Uninstall CLI target
-#uninstall-cli:
-#	sudo rm -rf $(BIN_DIR)/$(EXECUTABLE_CLI)
-#
-## Update CLI target
-#update-cli:
-#	git pull origin main
-#	make uninstall-cli
-#	make install
+# Install CLI target
+install: build
+	sudo cp $(BUILD_PATH)/$(EXECUTABLE) $(BIN_DIR)/tomodoro
+
+# Uninstall CLI target
+uninstall:
+	sudo rm -rf $(BIN_DIR)/$(EXECUTABLE)
+
+# Update CLI target
+update:
+	git pull origin main
+	make uninstall-cli
+	make install
 
 
 

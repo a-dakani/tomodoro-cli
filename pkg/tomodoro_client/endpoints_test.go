@@ -8,12 +8,12 @@ import (
 )
 
 var (
-	teamName = "tomodoro-test-team"
+	teamName = "test"
 	focus    = 25 * time.Minute.Nanoseconds()
 	pause    = 5 * time.Minute.Nanoseconds()
 )
 
-var teamSlug = "tomodoro-test-team"
+var teamSlug = "test"
 
 // Disable this test to avoid creating a new team every time
 

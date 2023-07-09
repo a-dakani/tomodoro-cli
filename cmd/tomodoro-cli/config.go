@@ -1,5 +1,9 @@
 package main
 
-const (
-	teamsFile = "teams.json"
+import "path"
+
+var (
+	teamsFile     = path.Join(configPath, teamsFileName)
+	configPath    = getConfigFilePath()
+	teamsFileName = "teams.json"
 )
