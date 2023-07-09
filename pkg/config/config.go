@@ -25,6 +25,9 @@ type Config struct {
 	BaseURLV1         string        `json:"base_url_v1"`
 	BaseWSURLV1       string        `json:"base_ws_url_v1"`
 	HTTPClientTimeout time.Duration `json:"http_client_timeout"`
+	ConfigPath        string        `json:"config_path"`
+	ConfigFilePath    string        `json:"config_file_path"`
+	TeamsFilePath     string        `json:"teams_file_path"`
 }
 
 var cfg *Config
@@ -33,7 +36,11 @@ func LoadConfig() *Config {
 	if cfg != nil {
 		return cfg
 	}
-	cfg = &Config{}
+	cfg = &Config{
+		ConfigPath:     configPath,
+		ConfigFilePath: configFilePath,
+		TeamsFilePath:  teamsFilePath,
+	}
 
 	cfg.load()
 	return cfg

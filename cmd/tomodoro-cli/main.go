@@ -9,7 +9,7 @@ import (
 
 var (
 	cfg   = config.LoadConfig()
-	teams = config.LoadTeams()
+	teams = LoadTeams()
 	tc    = tclient.NewHttpClient(cfg.BaseURLV1)
 )
 

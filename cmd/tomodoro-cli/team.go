@@ -1,4 +1,4 @@
-package config
+package main
 
 import (
 	"encoding/json"
@@ -28,12 +28,12 @@ func LoadTeams() *TeamList {
 }
 
 func (tl *TeamList) load() {
-	_, err := os.Stat(teamsFilePath)
+	_, err := os.Stat(cfg.TeamsFilePath)
 	if os.IsNotExist(err) {
 		tl.init()
 		tl.load()
 	}
-	bytes, err := os.ReadFile(teamsFilePath)
+	bytes, err := os.ReadFile(cfg.TeamsFilePath)
 	if err != nil {
 		panic(err)
 	}
@@ -52,12 +52,12 @@ func (tl *TeamList) init() {
 }
 
 func (tl *TeamList) Save() error {
-	if _, err := os.Stat(teamsFilePath); errors.Is(err, os.ErrNotExist) {
-		err = os.MkdirAll(configPath, os.ModePerm)
+	if _, err := os.Stat(cfg.TeamsFilePath); errors.Is(err, os.ErrNotExist) {
+		err = os.MkdirAll(cfg.ConfigPath, os.ModePerm)
 		if err != nil {
 			return err
 		}
-		_, err = os.Create(teamsFilePath)
+		_, err = os.Create(cfg.TeamsFilePath)
 		if err != nil {
 			return err
 		}
@@ -68,7 +68,7 @@ func (tl *TeamList) Save() error {
 		return err
 	}
 
-	err = os.WriteFile(teamsFilePath, bytes, 0600)
+	err = os.WriteFile(cfg.TeamsFilePath, bytes, 0600)
 	if err != nil {
 		return err
 	}
@@ -96,6 +96,7 @@ func (tl *TeamList) AddTeam(team Team) error {
 	*tl = append(*tl, team)
 	return tl.Save()
 }
+
 func (tl *TeamList) RemoveTeam(team Team) error {
 	for i, t := range *tl {
 		if t.Slug == team.Slug {

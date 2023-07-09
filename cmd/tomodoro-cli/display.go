@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/a-dakani/tomodoro-cli/pkg/config"
 	"github.com/charmbracelet/lipgloss"
 	"strings"
 )
@@ -140,7 +139,7 @@ func getSpaceChar() string {
 	return chars['s']
 }
 
-func getTimeString(t int64) string {
+func getBigTimeString(t int64) string {
 	m := t / 1000000000 / 60
 	s := t / 1000000000 % 60
 	m1 := m / 10
@@ -183,7 +182,7 @@ func addHelp(t string, help string, height int) string {
 	return b.String()
 }
 
-func renderTimer(team config.Team, remaining int64, name, state string) string {
+func renderTimer(team Team, remaining int64, name, state string) string {
 	var rb strings.Builder
 
 	var lb strings.Builder
@@ -202,7 +201,7 @@ func renderTimer(team config.Team, remaining int64, name, state string) string {
 	)
 	b.WriteString(lipgloss.JoinHorizontal(lipgloss.Top, lb.String(), rb.String()))
 	// Print Time
-	b.WriteString(getTimeString(remaining) + "\n")
+	b.WriteString(getBigTimeString(remaining) + "\n")
 
 	// Print Phase
 	b.WriteString(getPhase(name) + "\n")

@@ -2,18 +2,17 @@ package main
 
 import (
 	"context"
-	"github.com/a-dakani/tomodoro-cli/pkg/config"
 )
 
-func getTeam(teamName string) (config.Team, error) {
+func getTeam(teamName string) (Team, error) {
 	ctx := context.Background()
 	t, err := tc.GetTeam(ctx, teamName)
 
 	if err != nil {
-		return config.Team{}, err
+		return Team{}, err
 	}
 
-	return config.Team{
+	return Team{
 		Name:  t.Name,
 		Slug:  t.Slug,
 		Focus: t.Settings.Focus,
@@ -21,7 +20,7 @@ func getTeam(teamName string) (config.Team, error) {
 	}, nil
 }
 
-func startFocus(team config.Team) error {
+func startFocus(team Team) error {
 	ctx := context.Background()
 
 	_, err := tc.StartTimer(ctx, team.Slug, team.Focus, "Focus")
@@ -31,7 +30,7 @@ func startFocus(team config.Team) error {
 
 	return nil
 }
-func startPause(team config.Team) error {
+func startPause(team Team) error {
 	ctx := context.Background()
 
 	_, err := tc.StartTimer(ctx, team.Slug, team.Pause, "Pause")
@@ -41,7 +40,7 @@ func startPause(team config.Team) error {
 
 	return nil
 }
-func stopTimer(team config.Team) error {
+func stopTimer(team Team) error {
 	ctx := context.Background()
 
 	_, err := tc.StopTimer(ctx, team.Slug)

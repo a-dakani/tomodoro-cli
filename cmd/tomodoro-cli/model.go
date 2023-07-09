@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/a-dakani/tomodoro-cli/pkg/config"
 	"github.com/a-dakani/tomodoro-cli/pkg/tclient"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
@@ -11,8 +10,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-// ErrorMsg is a wrapper for error to implement the tea.Msg interface
-type ErrorMsg error
+// errorMsg is a wrapper for error to implement the tea.Msg interface
+type errorMsg error
 
 type sessionState int
 
@@ -75,8 +74,6 @@ func (m *model) Init() tea.Cmd {
 	return nil
 }
 
-//nolint:funlen
-//nolint:gocognit
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	var cmd tea.Cmd
@@ -110,12 +107,13 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case noTeams:
 		if msg, ok := msg.(tea.KeyMsg); ok {
 			if key.Matches(msg, Keymap.Add) {
+				m.input.Reset()
 				m.state = showInput
 			}
 		}
 	case showInput:
 		switch msg := msg.(type) {
-		case config.Team:
+		case Team:
 			if err := teams.AddTeam(msg); err != nil {
 				m.err = err
 				return m, nil
@@ -134,6 +132,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.err = nil
 				return m, m.addTeam()
 			case key.Matches(msg, Keymap.Back):
+				m.err = nil
 				if len(m.teamList.Items()) == 0 {
 					m.state = noTeams
 				} else {
@@ -150,15 +149,14 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case showList:
 		if msg, ok := msg.(tea.KeyMsg); ok {
 			switch {
-			// case key.Matches(msg, Keymap.Back):
-			//	return m, nil
 			case msg.Type == tea.KeyEnter:
 				m.state = showTimer
 				return m, tea.Batch(m.joinTeam(), m.waitForActivity())
 			case key.Matches(msg, Keymap.Add):
+				m.input.Reset()
 				m.state = showInput
 			case key.Matches(msg, Keymap.Remove):
-				if err := teams.RemoveTeam(m.teamList.Items()[m.teamList.Index()].(config.Team)); err != nil {
+				if err := teams.RemoveTeam(m.teamList.Items()[m.teamList.Index()].(Team)); err != nil {
 					m.err = err
 				}
 
@@ -251,7 +249,7 @@ func (m *model) View() string {
 	case showList:
 		output += m.teamList.View()
 	case showTimer:
-		t := renderTimer(m.teamList.SelectedItem().(config.Team), m.timerRemaining, m.timerName, string(m.timerState))
+		t := renderTimer(m.teamList.SelectedItem().(Team), m.timerRemaining, m.timerName, string(m.timerState))
 		output += addHelp(t, m.help.View(Keymap), m.height)
 	case showInput:
 		output += m.input.View()
@@ -265,7 +263,6 @@ func (m *model) View() string {
 }
 
 func (m *model) loadTeams() {
-
 	items := make([]list.Item, len(*teams))
 	for i, team := range *teams {
 		items[i] = team
@@ -283,18 +280,17 @@ func (m *model) addTeam() tea.Cmd {
 		team, err := getTeam(m.input.Value())
 		if err != nil {
 			m.err = err
-			return ErrorMsg(err)
+			return errorMsg(err)
 		}
-
 		return team
 	}
 }
 
 func (m *model) startFocus() tea.Cmd {
 	return func() tea.Msg {
-		err := startFocus(m.teamList.Items()[m.teamList.Index()].(config.Team))
+		err := startFocus(m.teamList.Items()[m.teamList.Index()].(Team))
 		if err != nil {
-			return ErrorMsg(err)
+			return errorMsg(err)
 		}
 
 		return m.waitForActivity()
@@ -303,9 +299,9 @@ func (m *model) startFocus() tea.Cmd {
 
 func (m *model) startPause() tea.Cmd {
 	return func() tea.Msg {
-		err := startPause(m.teamList.Items()[m.teamList.Index()].(config.Team))
+		err := startPause(m.teamList.Items()[m.teamList.Index()].(Team))
 		if err != nil {
-			return ErrorMsg(err)
+			return errorMsg(err)
 		}
 
 		return m.waitForActivity()
@@ -314,9 +310,9 @@ func (m *model) startPause() tea.Cmd {
 
 func (m *model) stopTimer() tea.Cmd {
 	return func() tea.Msg {
-		err := stopTimer(m.teamList.Items()[m.teamList.Index()].(config.Team))
+		err := stopTimer(m.teamList.Items()[m.teamList.Index()].(Team))
 		if err != nil {
-			return ErrorMsg(err)
+			return errorMsg(err)
 		}
 
 		return m.waitForActivity()
@@ -325,7 +321,7 @@ func (m *model) stopTimer() tea.Cmd {
 
 func (m *model) joinTeam() tea.Cmd {
 	return func() tea.Msg {
-		slug := m.teamList.SelectedItem().(config.Team).Slug
+		slug := m.teamList.SelectedItem().(Team).Slug
 		// if there is already a websocket connection, check if it is the same team
 		if m.ws != nil {
 			if m.ws.Slug == slug {
@@ -333,7 +329,7 @@ func (m *model) joinTeam() tea.Cmd {
 			}
 
 			m.ws.Stop()
-			m.ws = tclient.NewWebSocketClient(cfg.BaseWSURLV1, m.teamList.SelectedItem().(config.Team).Slug)
+			m.ws = tclient.NewWebSocketClient(cfg.BaseWSURLV1, m.teamList.SelectedItem().(Team).Slug)
 			m.ws.Start()
 
 			for {
@@ -343,7 +339,7 @@ func (m *model) joinTeam() tea.Cmd {
 			}
 		}
 
-		m.ws = tclient.NewWebSocketClient(cfg.BaseWSURLV1, m.teamList.SelectedItem().(config.Team).Slug)
+		m.ws = tclient.NewWebSocketClient(cfg.BaseWSURLV1, m.teamList.SelectedItem().(Team).Slug)
 		m.ws.Start()
 
 		for {

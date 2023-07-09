@@ -61,7 +61,7 @@ func (wsc *WebSocketClient) connect() *websocket.Conn {
 		default:
 			wsc.eventHandler(Connecting, nil)
 
-			ws, _, err := websocket.DefaultDialer.Dial(wsc.configStr, nil) //nolint:bodyclose
+			ws, _, err := websocket.DefaultDialer.Dial(wsc.configStr, nil)
 			if err != nil {
 				fmt.Printf("Cannot connect to websocket got error %s", err.Error())
 				continue
