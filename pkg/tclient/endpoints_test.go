@@ -1,4 +1,4 @@
-package tomodoro_client
+package tclient
 
 import (
 	"context"
@@ -18,7 +18,7 @@ var teamSlug = "test"
 // Disable this test to avoid creating a new team every time
 
 // func TestCreateTeam(t *testing.T) {
-//	tc := NewClient()
+//	tc := NewHttpClient()
 //	ctx := context.Background()
 //
 //	team, err := tc.CreateTeam(ctx, teamName)
@@ -30,7 +30,7 @@ var teamSlug = "test"
 //}
 
 func TestGetTeam(t *testing.T) {
-	tc := NewClient()
+	tc := NewHttpClient()
 	ctx := context.Background()
 
 	team, err := tc.GetTeam(ctx, teamSlug)
@@ -41,7 +41,7 @@ func TestGetTeam(t *testing.T) {
 }
 
 func TestUpdateSettings(t *testing.T) {
-	tc := NewClient()
+	tc := NewHttpClient()
 	ctx := context.Background()
 
 	settings, err := tc.UpdateSettings(ctx, teamName, focus, pause)
@@ -52,7 +52,7 @@ func TestUpdateSettings(t *testing.T) {
 }
 
 func TestStartTimer(t *testing.T) {
-	tc := NewClient()
+	tc := NewHttpClient()
 	ctx := context.Background()
 	// stop timer if running
 	_, _ = tc.StopTimer(ctx, teamSlug)
@@ -64,7 +64,7 @@ func TestStartTimer(t *testing.T) {
 }
 
 func TestStopTimer(t *testing.T) {
-	tc := NewClient()
+	tc := NewHttpClient()
 	ctx := context.Background()
 
 	timer, err := tc.StopTimer(ctx, teamSlug)

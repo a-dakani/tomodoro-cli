@@ -1,4 +1,4 @@
-package tomodoro_client
+package tclient
 
 import (
 	"encoding/json"

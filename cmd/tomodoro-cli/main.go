@@ -1,8 +1,16 @@
 package main
 
 import (
+	"github.com/a-dakani/tomodoro-cli/pkg/config"
+	"github.com/a-dakani/tomodoro-cli/pkg/tclient"
 	tea "github.com/charmbracelet/bubbletea"
 	"log"
+)
+
+var (
+	cfg   = config.LoadConfig()
+	teams = config.LoadTeams()
+	tc    = tclient.NewHttpClient(cfg.BaseURLV1)
 )
 
 func main() {

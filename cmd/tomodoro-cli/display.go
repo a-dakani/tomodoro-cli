@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/a-dakani/tomodoro-cli/pkg/config"
 	"github.com/charmbracelet/lipgloss"
 	"strings"
 )
@@ -182,7 +183,7 @@ func addHelp(t string, help string, height int) string {
 	return b.String()
 }
 
-func renderTimer(team Team, remaining int64, name, state string) string {
+func renderTimer(team config.Team, remaining int64, name, state string) string {
 	var rb strings.Builder
 
 	var lb strings.Builder

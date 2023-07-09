@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	tomodoro "github.com/a-dakani/tomodoro-cli/pkg/tomodoro_client"
+	"github.com/a-dakani/tomodoro-cli/pkg/config"
+	"github.com/a-dakani/tomodoro-cli/pkg/tclient"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
@@ -25,11 +26,11 @@ const (
 type model struct {
 	title          string
 	state          sessionState
-	sub            chan tomodoro.Message
-	ws             *tomodoro.WebSocketClient
+	sub            chan tclient.Message
+	ws             *tclient.WebSocketClient
 	input          textinput.Model
 	timerName      string
-	timerState     tomodoro.MessageType
+	timerState     tclient.MessageType
 	timerRemaining int64
 	teamList       list.Model
 	help           help.Model
@@ -55,10 +56,10 @@ func newModel() *model {
 	return &model{
 		title:          "Tomodoro",
 		state:          noTeams,
-		sub:            make(chan tomodoro.Message, 100),
+		sub:            make(chan tclient.Message, 100),
 		input:          ti,
 		timerName:      "Inactive",
-		timerState:     tomodoro.TimerStopped,
+		timerState:     tclient.TimerStopped,
 		timerRemaining: 0,
 		teamList:       tl,
 		help:           help.New(),
@@ -114,8 +115,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case showInput:
 		switch msg := msg.(type) {
-		case Team:
-			if err := addTeamToFile(msg); err != nil {
+		case config.Team:
+			if err := teams.AddTeam(msg); err != nil {
 				m.err = err
 				return m, nil
 			}
@@ -157,7 +158,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case key.Matches(msg, Keymap.Add):
 				m.state = showInput
 			case key.Matches(msg, Keymap.Remove):
-				if err := removeTeamFromFile(m.teamList.Items()[m.teamList.Index()].(Team)); err != nil {
+				if err := teams.RemoveTeam(m.teamList.Items()[m.teamList.Index()].(config.Team)); err != nil {
 					m.err = err
 				}
 
@@ -175,32 +176,32 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.teamList, cmd = m.teamList.Update(msg)
 	case showTimer:
 		switch msg := msg.(type) {
-		case tomodoro.Message:
+		case tclient.Message:
 			switch msg.Type {
-			case tomodoro.Tick:
-				if m.timerState != tomodoro.TimerStarted {
-					m.timerState = tomodoro.TimerStarted
+			case tclient.Tick:
+				if m.timerState != tclient.TimerStarted {
+					m.timerState = tclient.TimerStarted
 				}
 
 				m.timerName = msg.Payload.Name
 				m.timerRemaining = msg.Payload.RemainingTime
-			case tomodoro.TimerStarted:
-				m.timerState = tomodoro.TimerStarted
+			case tclient.TimerStarted:
+				m.timerState = tclient.TimerStarted
 				m.timerName = msg.Payload.Name
-			case tomodoro.TimerStopped:
+			case tclient.TimerStopped:
 				m.timerRemaining = 0
 				m.timerName = "Inactive"
-				m.timerState = tomodoro.TimerStopped
-			case tomodoro.Connecting:
-				m.timerState = tomodoro.Connecting
-			case tomodoro.Connected:
-				m.timerState = tomodoro.Connected
-			case tomodoro.Terminating:
+				m.timerState = tclient.TimerStopped
+			case tclient.Connecting:
+				m.timerState = tclient.Connecting
+			case tclient.Connected:
+				m.timerState = tclient.Connected
+			case tclient.Terminating:
 				m.timerRemaining = 0
 				m.timerName = "Inactive"
-				m.timerState = tomodoro.Terminating
-			case tomodoro.Error:
-				m.timerState = tomodoro.Error
+				m.timerState = tclient.Terminating
+			case tclient.Error:
+				m.timerState = tclient.Error
 				m.err = msg.Error
 			}
 
@@ -250,7 +251,7 @@ func (m *model) View() string {
 	case showList:
 		output += m.teamList.View()
 	case showTimer:
-		t := renderTimer(m.teamList.SelectedItem().(Team), m.timerRemaining, m.timerName, string(m.timerState))
+		t := renderTimer(m.teamList.SelectedItem().(config.Team), m.timerRemaining, m.timerName, string(m.timerState))
 		output += addHelp(t, m.help.View(Keymap), m.height)
 	case showInput:
 		output += m.input.View()
@@ -264,16 +265,9 @@ func (m *model) View() string {
 }
 
 func (m *model) loadTeams() {
-	var teams []Team
 
-	teams, err := readTeamsFile()
-	if err != nil {
-		teams = []Team{}
-		m.err = err
-	}
-
-	items := make([]list.Item, len(teams))
-	for i, team := range teams {
+	items := make([]list.Item, len(*teams))
+	for i, team := range *teams {
 		items[i] = team
 	}
 
@@ -298,7 +292,7 @@ func (m *model) addTeam() tea.Cmd {
 
 func (m *model) startFocus() tea.Cmd {
 	return func() tea.Msg {
-		err := startFocus(m.teamList.Items()[m.teamList.Index()].(Team))
+		err := startFocus(m.teamList.Items()[m.teamList.Index()].(config.Team))
 		if err != nil {
 			return ErrorMsg(err)
 		}
@@ -309,7 +303,7 @@ func (m *model) startFocus() tea.Cmd {
 
 func (m *model) startPause() tea.Cmd {
 	return func() tea.Msg {
-		err := startPause(m.teamList.Items()[m.teamList.Index()].(Team))
+		err := startPause(m.teamList.Items()[m.teamList.Index()].(config.Team))
 		if err != nil {
 			return ErrorMsg(err)
 		}
@@ -320,7 +314,7 @@ func (m *model) startPause() tea.Cmd {
 
 func (m *model) stopTimer() tea.Cmd {
 	return func() tea.Msg {
-		err := stopTimer(m.teamList.Items()[m.teamList.Index()].(Team))
+		err := stopTimer(m.teamList.Items()[m.teamList.Index()].(config.Team))
 		if err != nil {
 			return ErrorMsg(err)
 		}
@@ -331,7 +325,7 @@ func (m *model) stopTimer() tea.Cmd {
 
 func (m *model) joinTeam() tea.Cmd {
 	return func() tea.Msg {
-		slug := m.teamList.SelectedItem().(Team).Slug
+		slug := m.teamList.SelectedItem().(config.Team).Slug
 		// if there is already a websocket connection, check if it is the same team
 		if m.ws != nil {
 			if m.ws.Slug == slug {
@@ -339,7 +333,7 @@ func (m *model) joinTeam() tea.Cmd {
 			}
 
 			m.ws.Stop()
-			m.ws = tomodoro.NewWebSocketClient(m.teamList.SelectedItem().(Team).Slug)
+			m.ws = tclient.NewWebSocketClient(cfg.BaseWSURLV1, m.teamList.SelectedItem().(config.Team).Slug)
 			m.ws.Start()
 
 			for {
@@ -349,7 +343,7 @@ func (m *model) joinTeam() tea.Cmd {
 			}
 		}
 
-		m.ws = tomodoro.NewWebSocketClient(m.teamList.SelectedItem().(Team).Slug)
+		m.ws = tclient.NewWebSocketClient(cfg.BaseWSURLV1, m.teamList.SelectedItem().(config.Team).Slug)
 		m.ws.Start()
 
 		for {

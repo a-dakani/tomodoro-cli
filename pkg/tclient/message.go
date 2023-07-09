@@ -1,4 +1,4 @@
-package tomodoro_client
+package tclient
 
 // MessageType is the type of message received from the websocket
 type MessageType string

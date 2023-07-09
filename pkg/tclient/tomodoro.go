@@ -1,4 +1,4 @@
-package tomodoro_client
+package tclient
 
 import (
 	"context"
@@ -6,6 +6,15 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"time"
+)
+
+const (
+	urlTeamSlug       = "team"
+	urlTimerSlug      = "timer"
+	urlStartTimerSlug = "start"
+	urlSettingsSlug   = "settings"
+	httpTimeout       = time.Minute
 )
 
 // Client is the http Client
@@ -14,12 +23,12 @@ type Client struct {
 	httpClient  *http.Client
 }
 
-// NewClient creates a new Http Client
-func NewClient() *Client {
+// NewHttpClient creates a new Http Client
+func NewHttpClient(baseUrl string) *Client {
 	return &Client{
-		httpBaseURL: baseURLV1,
+		httpBaseURL: baseUrl,
 		httpClient: &http.Client{
-			Timeout: httpClientTimeout,
+			Timeout: httpTimeout,
 		},
 	}
 }

@@ -1,4 +1,4 @@
-package tomodoro_client
+package tclient
 
 import (
 	"context"
@@ -25,7 +25,7 @@ type WebSocketClient struct {
 }
 
 // NewWebSocketClient creates a new websocket Client
-func NewWebSocketClient(teamSlug string) *WebSocketClient {
+func NewWebSocketClient(baseWSURLV1, teamSlug string) *WebSocketClient {
 	wsc := WebSocketClient{}
 	wsc.Slug = teamSlug
 	wsc.configStr, _ = url.JoinPath(baseWSURLV1, urlTeamSlug, teamSlug, "ws")
