@@ -9,10 +9,13 @@ import (
 )
 
 const (
-	baseURLV1      = "https://api.tomodoro.de/api/v1/"
-	baseWSURLV1    = "wss://api.tomodoro.de/api/v1/"
-	teamsFileName  = "teamList.json"
-	configFileName = "config.json"
+	baseURLV1                 = "https://api.tomodoro.de/api/v1/"
+	baseWSURLV1               = "wss://api.tomodoro.de/api/v1/"
+	teamsFileName             = "teamList.json"
+	configFileName            = "config.json"
+	notificationTitle         = "Tomodoro"
+	notificationSoundFileName = "default.mp3"
+	notificationImageFileName = "logo.png"
 )
 
 var (
@@ -22,12 +25,15 @@ var (
 )
 
 type Config struct {
-	BaseURLV1         string        `json:"base_url_v1"`
-	BaseWSURLV1       string        `json:"base_ws_url_v1"`
-	HTTPClientTimeout time.Duration `json:"http_client_timeout"`
-	ConfigPath        string        `json:"config_path"`
-	ConfigFilePath    string        `json:"config_file_path"`
-	TeamsFilePath     string        `json:"teams_file_path"`
+	BaseURLV1             string        `json:"base_url_v1"`
+	BaseWSURLV1           string        `json:"base_ws_url_v1"`
+	HTTPClientTimeout     time.Duration `json:"http_client_timeout"`
+	ConfigPath            string        `json:"config_path"`
+	ConfigFilePath        string        `json:"config_file_path"`
+	TeamsFilePath         string        `json:"teams_file_path"`
+	NotificationTitle     string        `json:"notification_title"`
+	NotificationSoundPath string        `json:"notification_sound"`
+	NotificationImagePath string        `json:"notification_image"`
 }
 
 var cfg *Config
@@ -66,6 +72,9 @@ func (c *Config) init() {
 	c.BaseURLV1 = baseURLV1
 	c.BaseWSURLV1 = baseWSURLV1
 	c.HTTPClientTimeout = time.Minute
+	c.NotificationTitle = notificationTitle
+	c.NotificationSoundPath = path.Join(configPath, notificationSoundFileName)
+	c.NotificationImagePath = path.Join(configPath, notificationImageFileName)
 
 	err := c.save()
 	if err != nil {

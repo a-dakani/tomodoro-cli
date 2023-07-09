@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/a-dakani/tomodoro-cli/pkg/config"
+	"github.com/a-dakani/tomodoro-cli/pkg/notifier"
 	"github.com/a-dakani/tomodoro-cli/pkg/tclient"
 	tea "github.com/charmbracelet/bubbletea"
 	"log"
@@ -10,6 +11,7 @@ import (
 var (
 	cfg   = config.LoadConfig()
 	teams = LoadTeams()
+	n     = notifier.NewNotifier(cfg.NotificationTitle, cfg.NotificationImagePath, cfg.NotificationSoundPath)
 	tc    = tclient.NewHttpClient(cfg.BaseURLV1)
 )
 
