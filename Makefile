@@ -5,6 +5,7 @@ BIN_DIR=/usr/local/bin
 GOCMD = go
 GOBUILD = $(GOCMD) build
 GOCLEAN = $(GOCMD) clean
+GOTEST = $(GOCMD) test
 
 # Main package and executable name
 PACKAGE = ./cmd/tomodoro-cli
@@ -34,6 +35,9 @@ clean:
 	$(GOCLEAN)
 	rm -rf $(BUILD_PATH)
 
+# Test target
+test:
+	$(GOTEST) -v ./...
 
 # Install CLI target
 install: build

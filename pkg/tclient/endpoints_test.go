@@ -7,18 +7,21 @@ import (
 	"time"
 )
 
-var (
-	teamName = "test"
-	focus    = 25 * time.Minute.Nanoseconds()
-	pause    = 5 * time.Minute.Nanoseconds()
+const (
+	teamName  = "test"
+	teamSlug  = "test"
+	baseURLV1 = "https://api.tomodoro.de/api/v1/"
 )
 
-var teamSlug = "test"
+var (
+	focus = 25 * time.Minute.Nanoseconds()
+	pause = 5 * time.Minute.Nanoseconds()
+)
 
 // Disable this test to avoid creating a new team every time
 
 // func TestCreateTeam(t *testing.T) {
-//	tc := NewHttpClient()
+//	tc := NewHttpClient(baseURLV1)
 //	ctx := context.Background()
 //
 //	team, err := tc.CreateTeam(ctx, teamName)
@@ -30,7 +33,7 @@ var teamSlug = "test"
 //}
 
 func TestGetTeam(t *testing.T) {
-	tc := NewHttpClient()
+	tc := NewHttpClient(baseURLV1)
 	ctx := context.Background()
 
 	team, err := tc.GetTeam(ctx, teamSlug)
@@ -41,7 +44,7 @@ func TestGetTeam(t *testing.T) {
 }
 
 func TestUpdateSettings(t *testing.T) {
-	tc := NewHttpClient()
+	tc := NewHttpClient(baseURLV1)
 	ctx := context.Background()
 
 	settings, err := tc.UpdateSettings(ctx, teamName, focus, pause)
@@ -52,7 +55,7 @@ func TestUpdateSettings(t *testing.T) {
 }
 
 func TestStartTimer(t *testing.T) {
-	tc := NewHttpClient()
+	tc := NewHttpClient(baseURLV1)
 	ctx := context.Background()
 	// stop timer if running
 	_, _ = tc.StopTimer(ctx, teamSlug)
@@ -64,7 +67,7 @@ func TestStartTimer(t *testing.T) {
 }
 
 func TestStopTimer(t *testing.T) {
-	tc := NewHttpClient()
+	tc := NewHttpClient(baseURLV1)
 	ctx := context.Background()
 
 	timer, err := tc.StopTimer(ctx, teamSlug)
