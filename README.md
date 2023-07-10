@@ -42,7 +42,7 @@ Follow the steps below to install the Tomodoro CLI:
 
 ## Uninstallation
 
-If you decide to remove the Tomodoro CLI, you can do so by running the following command:
+If you decide to remove the Tomodoro CLI, you can do so by running the following command (requires sudo access):
 
 ```shell
 make uninstall
@@ -50,4 +50,6 @@ make uninstall
 
 This will uninstall the CLI and remove the config files from your system.
 
-![](https://github.com/a-dakani/tomodoro-cli/demo.gif)
+## Demo
+
+![](https://github.com/a-dakani/tomodoro-cli/blob/main/demo.gif?raw=true)
