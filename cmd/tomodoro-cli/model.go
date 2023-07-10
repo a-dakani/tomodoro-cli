@@ -50,6 +50,7 @@ func newModel() *model {
 	delegate.ShortHelpFunc = func() []key.Binding { return []key.Binding{Keymap.Add, Keymap.Remove} }
 	delegate.FullHelpFunc = func() [][]key.Binding { return [][]key.Binding{{Keymap.Add, Keymap.Remove}} }
 	tl := list.New([]list.Item{}, delegate, initialListHeight, initialListWidth)
+	tl.SetFilteringEnabled(false)
 	tl.Title = "Teams"
 
 	return &model{

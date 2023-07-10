@@ -39,24 +39,15 @@ clean:
 test:
 	$(GOTEST) -v ./...
 
-# Install CLI target
+# Install CLI target (requires sudo)
 install: build
 	sudo cp $(BUILD_PATH)/$(EXECUTABLE) $(BIN_DIR)/tomodoro
 	mkdir -p $(CONFIG_PATH)
 	cp ./static/logo.png $(CONFIG_PATH)/logo.png
-	cp ./static/default.mp3 $(CONFIG_PATH)/default.mp3
 
-# Uninstall CLI target
+# Uninstall CLI target (requires sudo)
 uninstall:
 	sudo rm -rf $(BIN_DIR)/$(EXECUTABLE)
-	rm -rf $(CONFIG_PATH)
-
-# Update CLI target
-update:
-	git pull origin main
-	make uninstall-cli
-	make install
-
-
+	sudo rm -rf $(CONFIG_PATH)
 
 
