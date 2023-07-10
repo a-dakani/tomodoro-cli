@@ -11,7 +11,7 @@ import (
 var (
 	cfg   = config.LoadConfig()
 	teams = LoadTeams()
-	n     = notifier.NewNotifier(cfg.NotificationTitle, cfg.NotificationImagePath, cfg.NotificationSoundPath)
+	n     = notifier.NewNotifier(cfg.NotificationTitle, cfg.NotificationImagePath)
 	tc    = tclient.NewHttpClient(cfg.BaseURLV1)
 )
 

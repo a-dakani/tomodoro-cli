@@ -186,12 +186,12 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case tclient.TimerStarted:
 				m.timerState = tclient.TimerStarted
 				m.timerName = msg.Payload.Name
-				n.Notify(fmt.Sprintf("Timer %s started", msg.Payload.Name))
+				_ = n.Notify(fmt.Sprintf("Timer %s started", msg.Payload.Name))
 			case tclient.TimerStopped:
 				m.timerRemaining = 0
 				m.timerName = "Inactive"
 				m.timerState = tclient.TimerStopped
-				n.Notify(fmt.Sprintf("Timer %s stopped", msg.Payload.Name))
+				_ = n.Notify(fmt.Sprintf("Timer %s stopped", msg.Payload.Name))
 			case tclient.Connecting:
 				m.timerState = tclient.Connecting
 			case tclient.Connected:
