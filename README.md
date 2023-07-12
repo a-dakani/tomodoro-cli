@@ -1,6 +1,6 @@
 # Tomodoro CLI
 
-The Tomodoro CLI is a command-line interface for the tomodoro.de website, offering synchronized pomodoro timers right in your command line.
+The Tomodoro CLI is a command-line interface for the [tomodoro.de](https://app.tomodoro.de/) website, offering synchronized pomodoro timers right in your command line.
 
 With this interactive CLI, you can easily fetch teams, start or pause timers, and keep them in sync with other team members.
 
