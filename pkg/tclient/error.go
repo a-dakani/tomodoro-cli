@@ -15,7 +15,7 @@ type errorResponse struct {
 	} `json:"error"`
 }
 
-type requestError struct {
+type RequestError struct {
 	StatusCode int
 	Href       string
 	Err        error
@@ -29,25 +29,25 @@ func newRequestError(res *http.Response) error {
 			res.Request.URL, res.StatusCode)
 	}
 
-	return &requestError{
+	return &RequestError{
 		StatusCode: res.StatusCode,
 		Href:       res.Request.URL.String(),
 		Err:        errors.New(resBody.Error.Message),
 	}
 }
 
-func (r *requestError) Error() string {
+func (r *RequestError) Error() string {
 	return fmt.Sprintf("While calling %s got status: %d and error: %v", r.Href, r.StatusCode, r.Err)
 }
-func (r *requestError) NotFound() bool {
+func (r *RequestError) NotFound() bool {
 	return r.StatusCode == http.StatusNotFound
 }
-func (r *requestError) BadRequest() bool {
+func (r *RequestError) BadRequest() bool {
 	return r.StatusCode == http.StatusBadRequest
 }
-func (r *requestError) Gone() bool {
+func (r *RequestError) Gone() bool {
 	return r.StatusCode == http.StatusGone
 }
-func (r *requestError) InternalServerError() bool {
+func (r *RequestError) InternalServerError() bool {
 	return r.StatusCode == http.StatusInternalServerError
 }

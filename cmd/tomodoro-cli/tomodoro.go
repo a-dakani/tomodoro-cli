@@ -2,14 +2,25 @@ package main
 
 import (
 	"context"
+	"github.com/a-dakani/tomodoro-cli/pkg/tclient"
 )
 
-func getTeam(teamName string) (Team, error) {
+func getOrCreateTeam(teamName string) (Team, error) {
 	ctx := context.Background()
 	t, err := tc.GetTeam(ctx, teamName)
-
 	if err != nil {
-		return Team{}, err
+		if err.(*tclient.RequestError).NotFound() {
+			_, err = tc.CreateTeam(ctx, teamName)
+			if err != nil {
+				return Team{}, err
+			}
+			t, err = tc.GetTeam(ctx, teamName)
+			if err != nil {
+				return Team{}, err
+			}
+		} else {
+			return Team{}, err
+		}
 	}
 
 	return Team{

@@ -42,7 +42,7 @@ type model struct {
 func newModel() *model {
 	ti := textinput.New()
 	ti.CharLimit = 30
-	ti.Placeholder = "Team Slug"
+	ti.Placeholder = "Team Name"
 	ti.Focus()
 
 	delegate := list.NewDefaultDelegate()
@@ -280,7 +280,7 @@ func (m *model) loadTeams() {
 
 func (m *model) addTeam() tea.Cmd {
 	return func() tea.Msg {
-		team, err := getTeam(m.input.Value())
+		team, err := getOrCreateTeam(m.input.Value())
 		if err != nil {
 			m.err = err
 			return errorMsg(err)
