@@ -9,7 +9,11 @@ import (
 
 var teamList *TeamList
 
-type TeamList []Team
+type TeamList struct {
+	Teams      []Team `json:"tl"`
+	ConfigPath string `json:"config_path"`
+	FilePath   string `json:"file_path"`
+}
 
 type Team struct {
 	Name  string `json:"name"`
@@ -18,26 +22,30 @@ type Team struct {
 	Pause int64  `json:"pause"`
 }
 
-func LoadTeams() *TeamList {
+func NewTeamList(configPath, filePath string) *TeamList {
 	if teamList != nil {
 		return teamList
 	}
-	teamList = &TeamList{}
+	teamList = &TeamList{
+		ConfigPath: configPath,
+		FilePath:   filePath,
+		Teams:      []Team{},
+	}
 	teamList.load()
 	return teamList
 }
 
 func (tl *TeamList) load() {
-	_, err := os.Stat(cfg.TeamsFilePath)
+	_, err := os.Stat(tl.FilePath)
 	if os.IsNotExist(err) {
 		tl.init()
 		tl.load()
 	}
-	bytes, err := os.ReadFile(cfg.TeamsFilePath)
+	bytes, err := os.ReadFile(tl.FilePath)
 	if err != nil {
 		panic(err)
 	}
-	err = json.Unmarshal(bytes, tl)
+	err = json.Unmarshal(bytes, &tl.Teams)
 	if err != nil {
 		panic(err)
 	}
@@ -52,23 +60,23 @@ func (tl *TeamList) init() {
 }
 
 func (tl *TeamList) Save() error {
-	if _, err := os.Stat(cfg.TeamsFilePath); errors.Is(err, os.ErrNotExist) {
-		err = os.MkdirAll(cfg.ConfigPath, os.ModePerm)
+	if _, err := os.Stat(tl.FilePath); errors.Is(err, os.ErrNotExist) {
+		err = os.MkdirAll(tl.ConfigPath, os.ModePerm)
 		if err != nil {
 			return err
 		}
-		_, err = os.Create(cfg.TeamsFilePath)
+		_, err = os.Create(tl.FilePath)
 		if err != nil {
 			return err
 		}
 	}
 
-	bytes, err := json.MarshalIndent(tl, "", "  ")
+	bytes, err := json.MarshalIndent(tl.Teams, "", "  ")
 	if err != nil {
 		return err
 	}
 
-	err = os.WriteFile(cfg.TeamsFilePath, bytes, 0600)
+	err = os.WriteFile(tl.FilePath, bytes, 0600)
 	if err != nil {
 		return err
 	}
@@ -77,7 +85,7 @@ func (tl *TeamList) Save() error {
 }
 
 func (tl *TeamList) TeamExists(team Team) bool {
-	for _, t := range *tl {
+	for _, t := range tl.Teams {
 		if t.Slug == team.Slug {
 			return true
 		}
@@ -87,20 +95,20 @@ func (tl *TeamList) TeamExists(team Team) bool {
 
 func (tl *TeamList) AddTeam(team Team) error {
 	// check if team already exists if it does replace it with the newModel one else append it
-	for i, t := range *tl {
+	for i, t := range tl.Teams {
 		if t.Slug == team.Slug {
-			(*tl)[i] = team
+			tl.Teams[i] = team
 			return tl.Save()
 		}
 	}
-	*tl = append(*tl, team)
+	tl.Teams = append(tl.Teams, team)
 	return tl.Save()
 }
 
 func (tl *TeamList) RemoveTeam(team Team) error {
-	for i, t := range *tl {
+	for i, t := range tl.Teams {
 		if t.Slug == team.Slug {
-			*tl = append((*tl)[:i], (*tl)[i+1:]...)
+			tl.Teams = append(tl.Teams[:i], tl.Teams[i+1:]...)
 			return tl.Save()
 		}
 	}

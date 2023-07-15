@@ -9,10 +9,10 @@ import (
 )
 
 var (
-	cfg   = config.LoadConfig()
-	teams = LoadTeams()
-	n     = notifier.NewNotifier(cfg.NotificationTitle, cfg.NotificationImagePath)
-	tc    = tclient.NewHttpClient(cfg.BaseURLV1)
+	cfg = config.LoadConfig()
+	tl  = NewTeamList(cfg.ConfigPath, cfg.TeamsFilePath)
+	n   = notifier.NewNotifier(cfg.NotificationTitle, cfg.NotificationImagePath)
+	tc  = tclient.NewHttpClient(cfg.BaseURLV1)
 )
 
 func main() {

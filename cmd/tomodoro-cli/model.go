@@ -115,7 +115,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case showInput:
 		switch msg := msg.(type) {
 		case Team:
-			if err := teams.AddTeam(msg); err != nil {
+			if err := tl.AddTeam(msg); err != nil {
 				m.err = err
 				return m, nil
 			}
@@ -157,7 +157,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.input.Reset()
 				m.state = showInput
 			case key.Matches(msg, Keymap.Remove):
-				if err := teams.RemoveTeam(m.teamList.Items()[m.teamList.Index()].(Team)); err != nil {
+				if err := tl.RemoveTeam(m.teamList.Items()[m.teamList.Index()].(Team)); err != nil {
 					m.err = err
 				}
 
@@ -266,8 +266,8 @@ func (m *model) View() string {
 }
 
 func (m *model) loadTeams() {
-	items := make([]list.Item, len(*teams))
-	for i, team := range *teams {
+	items := make([]list.Item, len(tl.Teams))
+	for i, team := range tl.Teams {
 		items[i] = team
 	}
 
