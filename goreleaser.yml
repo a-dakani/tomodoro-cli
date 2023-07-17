@@ -1,0 +1,32 @@
+builds:
+  - binary: tomodoro
+    goos:
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -mod=vendor
+
+release:
+  prerelease: auto
+
+universal_binaries:
+  - replace: true
+
+brews:
+  -
+    name: tomodoro
+    homepage: https://github.com/a-dakani/tomodoro-cli
+    tap:
+      owner: dakani
+      name: homebrew-tomodoro
+    commit_author:
+      name: a-dakani
+      email: dakani@sipgate.de
+
+checksum:
+  name_template: 'checksums.txt'
