@@ -22,7 +22,7 @@ brews:
   -
     name: tomodoro
     homepage: https://github.com/a-dakani/tomodoro-cli
-    tap:
+    repository:
       owner: a-dakani
       name: homebrew-a-dakani
     commit_author:
