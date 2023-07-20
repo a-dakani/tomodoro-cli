@@ -1,5 +1,6 @@
 builds:
-  - binary: tomodoro
+  - main: cmd/tomodoro-cli/main.go
+    binary: tomodoro
     goos:
       - darwin
       - linux
